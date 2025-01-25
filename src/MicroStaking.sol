@@ -16,4 +16,33 @@ contract Token is ERC20, Owned {
     }
 }
 
-contract MicroStaking {}
+contract MicroStaking {
+    Token public token;
+    uint256 public s_lastUpdated;
+    uint256 public s_growthRate;
+    uint256 public s_rewardsPerShare;
+
+    mapping(address => uint256) public s_staked;
+
+    constructor(Token _token) {
+        token = _token;
+        s_lastUpdated = block.timestamp;
+        s_growthRate = 10e18;
+    }
+
+    modifier update() {
+        _;
+    }
+
+    function stake(uint256 amount) external {
+        require(amount >= token.balanceOf(msg.sender), "Not enough tokens!");
+        token.transferFrom(msg.sender, address(this), amount);
+        s_staked[msg.sender] += amount;
+    }
+
+    function unstake(uint256 amount) external {
+        require(s_staked[msg.sender] >= amount, "Not enough staked!");
+        token.transfer(msg.sender, amount);
+        s_staked[msg.sender] -= amount;
+    }
+}
