@@ -25,9 +25,9 @@ contract MicroStaking {
     mapping(address => uint256) public s_staked;
 
     constructor(Token _token) {
-        token = _token;
+        token         = _token;
         s_lastUpdated = block.timestamp;
-        s_growthRate = 10e18;
+        s_growthRate  = 10e18;
     }
 
     modifier update() {
