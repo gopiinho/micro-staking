@@ -34,15 +34,15 @@ contract MicroStaking {
 
     function stake(uint256 amount) external update(amount) {
         require(amount >= token.balanceOf(msg.sender), "Not enough tokens!");
-        token.transferFrom(msg.sender, address(this), amount);
         s_userStaked[msg.sender] += amount;
         s_debt      [msg.sender] += s_userStaked[msg.sender] * s_rewardsPerShare / 1e18;
+        token.transferFrom(msg.sender, address(this), amount);
     }
 
     function unstake(uint256 amount) external update(amount) {
         require(s_userStaked[msg.sender] >= amount, "Not enough staked!");
-        token.transfer(msg.sender, amount);
         s_userStaked[msg.sender] -= amount;
-        s_debt      [msg.sender] += s_userStaked[msg.sender] * s_rewardsPerShare / 1e18;
+        s_debt      [msg.sender] += s_userStaked[msg.sender] * s_rewardsPerShare / 1e18; 
+        token.transfer(msg.sender, amount);
     }
 }
