@@ -9,8 +9,34 @@ contract MicroStakingTest is Test {
     Token token;
     MicroStaking microStaking;
 
+    address USER;
+    uint256 constant MINT_AMOUNT = 10000e18;
+
     function setUp() public {
+        USER         = makeAddr("USER");
+        vm.startPrank(address(USER));
         token        = new Token();
-        microStaking = new MicroStaking(token);
+        microStaking = new MicroStaking(token);        
+        token.mint(USER, MINT_AMOUNT);    
+        vm.stopPrank();
+        vm.deal(USER, 1 ether);
+    }
+
+    modifier userStakes() {
+        vm.startPrank(USER);
+        token.approve(address(microStaking), MINT_AMOUNT);
+        microStaking.stake(MINT_AMOUNT);
+        vm.stopPrank();
+        _;
+    }
+
+    function testUserCanStake() public {
+        vm.startPrank(USER);
+        token.approve(address(microStaking), MINT_AMOUNT);
+        microStaking.stake(MINT_AMOUNT);
+        vm.stopPrank();
+
+        uint256 userStakingBalance = microStaking.s_userStaked(USER);
+        assertEq(userStakingBalance, MINT_AMOUNT);
     }
 }
