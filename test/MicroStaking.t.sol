@@ -2,7 +2,6 @@
 pragma solidity ^0.8.25;
 
 import "forge-std/Test.sol";
-
 import {Token, MicroStaking} from "../src/MicroStaking.sol";
 
 contract MicroStakingTest is Test {
@@ -38,5 +37,14 @@ contract MicroStakingTest is Test {
 
         uint256 userStakingBalance = microStaking.s_userStaked(USER);
         assertEq(userStakingBalance, MINT_AMOUNT);
+    }
+
+    function testUserCanUnstake() public userStakes {
+        uint256 unstakeAmount    = 1000e18;
+        uint256 userStakedAmount = microStaking.s_userStaked(USER);
+        vm.startPrank(USER);
+        microStaking.unstake(unstakeAmount);
+        vm.stopPrank();
+        assertEq(microStaking.s_userStaked(USER), userStakedAmount - unstakeAmount);
     }
 }
